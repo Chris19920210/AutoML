@@ -1,0 +1,12 @@
+{
+"id":"100_adaboost",
+"operation":"exec",
+"end_flag":"false",
+"worker_id":"14507986789798",
+"job_id":"100",
+"algo_name":"adaboost",
+"init":"true",
+"params":{"n_estimators": 10, "loss": "exponential", "learning_rate": 0.5, "max_depth": 3},
+"Eval":0.5,
+"param_space":[{"parameterName":"n_estimators","type":"INTEGER","minValue":1,"maxValue":100,"feasiblePoints": ""},{"parameterName":"loss","type":"CATEGORICAL","minValue":1,"maxValue":15,"feasiblePoints": ["exponential","logit"]},{"parameterName":"max_depth","type":"INTEGER","minValue":1,"maxValue":5,"feasiblePoints": ""},{"parameterName":"learning_rate","type":"DOUBLE","minValue":0.1,"maxValue":1,"feasiblePoints": ""}]
+}
