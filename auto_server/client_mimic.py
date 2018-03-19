@@ -8,9 +8,12 @@ from sklearn.cross_validation import train_test_split
 
 import mq
 from bayesian_research.utils import MyEncoder
+"""
+Mimic for client with multiple threads
+"""
 
 
-class Job:
+class Mimic:
     def __init__(self, files):
         self.mq = mq.JobMq()
         i = 0
@@ -56,7 +59,7 @@ class Job:
                 X_test=X_test,
                 y_train=y_train,
                 y_test=y_test,
-                id=id,
+                id=job_id,
                 params=dict(
                     num_leaves=30,
                     n_estimators=200,
@@ -72,6 +75,15 @@ class Job:
         job_id = job_['id']
         if job_["end_flag"] == "true":
             self.jobs[int(job_id.split('_')[1])] = True
+
+        flag = True
+        for each in self.jobs:
+            if each is not True:
+                flag = False
+
+        if flag:
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            self.mq.channel.stop_consuming()
         else:
             job = self.jobs[int(job_id.split('_')[1])]
             job["params"]["num_leaves"] = job_["params"]["num_leaves"]
@@ -80,19 +92,12 @@ class Job:
             job["params"]["reg_alpha"] = job_["params"]["reg_alpha"]
             job["params"]["reg_lambda"] = job_["params"]["reg_lambda"]
             self.train_thread(job)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def train_thread(self, job):
         _thread.start_new_thread(self.train, (job,))
 
     def train(self, job):
-        flag = True
-        for each in self.jobs:
-            if each is not True:
-                flag = False
-        if flag:
-            self.mq.channel.stop_consuming()
-
         model = lgb.LGBMClassifier(job["params"])
         model.fit(job["X_train"], job["y_train"],
                   eval_set=[(job["X_test"], job["y_test"])],
@@ -143,6 +148,6 @@ class Job:
 
 
 if __name__ == '__main__':
-    msgs = Job(sys.argv)
+    msgs = Mimic(sys.argv[1:])
     msgs.start()
     msgs.stop()

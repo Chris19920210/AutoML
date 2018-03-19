@@ -5,7 +5,7 @@ from bayesian_research.random_search import *
 import numpy as np
 import sys
 """
-Test for multiprocess
+Test for multi-processes
 """
 
 
