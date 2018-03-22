@@ -27,7 +27,7 @@ class JobMq:
     def consume(self, func):
         self.channel.basic_consume(func,
                                    queue=self.back_queue,
-                                   no_ack=False)
+                                   no_ack=True)
         self.channel.start_consuming()
         print('start consume: %s' % func)
 
